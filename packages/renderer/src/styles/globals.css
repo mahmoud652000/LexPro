@@ -1,0 +1,388 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    direction: rtl;
+    font-family: 'Cairo', 'Tahoma', 'Arial', sans-serif;
+    font-size: 14px;
+  }
+
+  body {
+    margin: 0;
+    background-color: #f5f5f5;
+    color: #1f2937;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .page-container {
+    @apply p-3 max-w-7xl mx-auto;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm p-4;
+  }
+
+  .stat-card {
+    @apply bg-white rounded-lg shadow-sm p-3 flex items-center gap-3;
+  }
+}
+
+/* الجداول */
+.ant-table {
+  font-size: 13px !important;
+}
+
+.ant-table-thead > tr > th {
+  padding: 8px 10px !important;
+  font-size: 13px !important;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 6px 10px !important;
+}
+
+.ant-table-small .ant-table-thead > tr > th {
+  padding: 6px 10px !important;
+}
+
+.ant-table-small .ant-table-tbody > tr > td {
+  padding: 5px 10px !important;
+}
+
+/* بطاقات الإحصائيات */
+.ant-statistic-title {
+  font-size: 13px !important;
+}
+
+.ant-statistic-content {
+  font-size: 22px !important;
+}
+
+/* القائمة الجانبية */
+.ant-menu-inline .ant-menu-item {
+  height: 36px !important;
+  line-height: 36px !important;
+  margin: 2px 0 !important;
+  font-size: 13px !important;
+}
+
+.ant-menu-inline .ant-menu-submenu-title {
+  height: 36px !important;
+  line-height: 36px !important;
+  font-size: 13px !important;
+}
+
+/* البطاقات */
+.ant-card-head {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+}
+
+.ant-card-head-title {
+  padding: 8px 0 !important;
+  font-size: 14px !important;
+}
+
+.ant-card-body {
+  padding: 14px !important;
+}
+
+/* Descriptions */
+.ant-descriptions-item-label {
+  font-size: 13px !important;
+}
+
+.ant-descriptions-item-content {
+  font-size: 13px !important;
+}
+
+/* النماذج */
+.ant-form-item-label > label {
+  font-size: 13px !important;
+}
+
+.ant-form-item {
+  margin-bottom: 14px !important;
+}
+
+/* الأزرار */
+.ant-btn-sm {
+  font-size: 13px !important;
+}
+
+/* تخصيص شريط التمرير */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* ============================================================ */
+/*  النوافذ المنبثقة الاحترافية — AppModal                        */
+/* ============================================================ */
+
+/* القناع الخلفي */
+.app-modal .ant-modal-mask {
+  background: rgba(6, 11, 22, 0.55) !important;
+  backdrop-filter: blur(2px);
+}
+
+/* الحاوية الرئيسية */
+.app-modal .ant-modal {
+  top: 24px !important;
+  padding-bottom: 24px;
+}
+
+.app-modal .ant-modal-content {
+  border-radius: 14px !important;
+  overflow: hidden;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.app-modal .ant-modal-close {
+  top: 12px !important;
+  inset-inline-end: 12px !important;
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  font-size: 16px !important;
+  color: #999 !important;
+  transition: all 0.2s ease !important;
+}
+
+.app-modal .ant-modal-close:hover {
+  background: rgba(0, 0, 0, 0.06) !important;
+  color: #c0392b !important;
+}
+
+/* إزالة الهيدر الافتراضي */
+.app-modal .ant-modal-header {
+  display: none !important;
+}
+
+.app-modal .ant-modal-body {
+  padding: 0 !important;
+}
+
+/* ===== Header مخصص ===== */
+.app-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.app-modal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.app-modal-icon .anticon {
+  color: #fff !important;
+  font-size: 20px !important;
+}
+
+.app-modal-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-modal-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1a2332;
+  line-height: 1.4;
+}
+
+.app-modal-subtitle {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* ===== Body ===== */
+.app-modal-body {
+  padding: 18px 20px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.app-modal-body::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.app-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #b0b4ba;
+}
+
+/* ===== أقسام النموذج — FormSection ===== */
+.app-modal-section {
+  background: #fafbfc;
+  border: 1px solid #f0f0f0;
+  border-radius: 10px;
+  padding: 14px 16px 4px;
+  margin-bottom: 16px;
+}
+
+.app-modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.app-modal-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.app-modal-section-icon .anticon {
+  color: #C9A227;
+  font-size: 15px;
+}
+
+.app-modal-section-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #2c3e50;
+  white-space: nowrap;
+}
+
+.app-modal-section-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.25), transparent);
+  margin-inline-start: 4px;
+}
+
+/* ===== Footer ===== */
+.app-modal .ant-modal-footer {
+  padding: 14px 20px !important;
+  background: #fafbfc !important;
+  border-top: 1px solid #f0f0f0 !important;
+  margin-top: 0 !important;
+}
+
+.app-modal-footer {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+/* زر الحفظ */
+.app-modal-save-btn.ant-btn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--btn-color, #27ae60) !important;
+  border-color: var(--btn-color, #27ae60) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.app-modal-save-btn.ant-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.app-modal-save-btn.ant-btn:active {
+  transform: translateY(0);
+}
+
+/* زر الإلغاء */
+.app-modal-cancel-btn.ant-btn {
+  min-width: 120px;
+  height: 40px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  border-color: #e0e0e0 !important;
+  color: #6b7280 !important;
+  transition: all 0.2s ease;
+}
+
+.app-modal-cancel-btn.ant-btn:hover {
+  background: #f5f5f5 !important;
+  border-color: #d0d0d0 !important;
+  color: #4b5563 !important;
+}
+
+/* ===== animation ===== */
+.app-modal .ant-modal {
+  animation: app-modal-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes app-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== تجاوزات للشاشات الصغيرة ===== */
+@media (max-width: 768px) {
+  .app-modal .ant-modal {
+    max-width: 95vw !important;
+    margin: 0 auto !important;
+  }
+
+  .app-modal .ant-modal-content {
+    border-radius: 10px !important;
+  }
+
+  .app-modal-header {
+    padding: 14px 16px 12px;
+  }
+
+  .app-modal-body {
+    padding: 14px 16px;
+  }
+
+  .app-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .app-modal-save-btn.ant-btn,
+  .app-modal-cancel-btn.ant-btn {
+    width: 100%;
+  }
+}

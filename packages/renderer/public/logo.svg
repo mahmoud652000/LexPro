@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 190 60" fill="none">
+  <!-- Icon: Scales of Justice in gold circle -->
+  <circle cx="30" cy="30" r="26" fill="#0F2C4D"/>
+  <circle cx="30" cy="30" r="25" stroke="#C9A227" stroke-width="1.5" fill="none"/>
+  <!-- Center beam -->
+  <line x1="30" y1="14" x2="30" y2="46" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+  <!-- Top knob -->
+  <circle cx="30" cy="14" r="2.5" fill="#C9A227"/>
+  <!-- Horizontal beam -->
+  <line x1="14" y1="20" x2="46" y2="20" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+  <!-- Left scale pan chains -->
+  <line x1="14" y1="20" x2="10" y2="28" stroke="#C9A227" stroke-width="1" stroke-linecap="round"/>
+  <line x1="14" y1="20" x2="18" y2="28" stroke="#C9A227" stroke-width="1" stroke-linecap="round"/>
+  <!-- Left scale pan -->
+  <path d="M8 28 Q14 36 20 28" stroke="#C9A227" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Right scale pan chains -->
+  <line x1="46" y1="20" x2="42" y2="28" stroke="#C9A227" stroke-width="1" stroke-linecap="round"/>
+  <line x1="46" y1="20" x2="50" y2="28" stroke="#C9A227" stroke-width="1" stroke-linecap="round"/>
+  <!-- Right scale pan -->
+  <path d="M40 28 Q46 36 52 28" stroke="#C9A227" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <!-- Base -->
+  <line x1="24" y1="46" x2="36" y2="46" stroke="#C9A227" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Text: LEX (gold) PRO (white) -->
+  <text x="66" y="28" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#C9A227">LEX</text>
+  <text x="108" y="28" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="700" fill="#E8E8E8">PRO</text>
+  <!-- Subtitle -->
+  <text x="66" y="44" font-family="Arial, sans-serif" font-size="8" fill="#C9A227" letter-spacing="1.5">LEGAL MANAGEMENT</text>
+</svg>

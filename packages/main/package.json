@@ -1,0 +1,21 @@
+{
+  "name": "@lexpro/main",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc && electron .",
+    "build": "tsc",
+    "start": "electron dist/index.js"
+  },
+  "dependencies": {
+    "electron-is-dev": "^3.0.1",
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.3",
+    "to-ico": "^1.1.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

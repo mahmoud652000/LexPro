@@ -1,0 +1,32 @@
+{
+  "appId": "com.lexpro.app",
+  "productName": "LEX PRO",
+  "directories": {
+    "output": "dist-electron"
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "mahmoud",
+      "repo": "LexPro",
+      "releaseType": "release",
+      "vPrefixedTagName": true
+    }
+  ],
+  "files": [
+    "packages/main/dist/**/*",
+    "packages/renderer/dist/**/*",
+    "packages/server/dist/**/*",
+    "node_modules/**/*"
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "build/icon.ico"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "shortcutName": "LEX PRO"
+  }
+}

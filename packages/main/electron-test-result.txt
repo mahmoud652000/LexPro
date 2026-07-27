@@ -1,0 +1,2 @@
+app type: undefined
+app is undefined!
