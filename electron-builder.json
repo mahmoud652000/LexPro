@@ -7,7 +7,7 @@
   "publish": [
     {
       "provider": "github",
-      "owner": "mahmoud",
+      "owner": "mahmoud652000",
       "repo": "LexPro",
       "releaseType": "release",
       "vPrefixedTagName": true
