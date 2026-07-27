@@ -1,10 +1,10 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm run build:server"
+buildCommand = "npm install && npm run build -w @lexpro/server"
 
 [deploy]
 startCommand = "npm start -w @lexpro/server"
-healthcheckPath = "/api/auth/login"
+healthcheckPath = "/api/version"
 healthcheckTimeout = 30
 
 [deploy.envVariables]
