@@ -157,6 +157,17 @@ router.get('/version', async (_req: Request, res: Response) => {
   }
 });
 
+// مسار فحص حالة النظام (للتشخيص)
+router.get('/debug', (_req: Request, res: Response) => {
+  res.json({
+    nodeVersion: process.version,
+    hasCrypto: typeof (globalThis as any).crypto !== 'undefined',
+    hasWebcrypto: typeof (globalThis as any).crypto?.getRandomValues === 'function',
+    multerVersion: require('multer/package.json').version,
+    megaVersion: require('megajs/package.json').version,
+  });
+});
+
 // تطبيق المصادقة على جميع المسارات التالية
 router.use(authMiddleware);
 router.use(activityLogger);
