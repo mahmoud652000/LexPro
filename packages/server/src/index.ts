@@ -115,11 +115,8 @@ async function start(): Promise<void> {
   server.listen(PORT, () => {
     console.log(`🚀 خادم LEX PRO يعمل على المنفذ ${PORT}`);
 
-    // تهيئة Mega Storage في الخلفية (مع timeout)
-    const megaTimeout = new Promise<void>((_, reject) =>
-      setTimeout(() => reject(new Error('انتهت مهلة الاتصال بـ Mega')), 15000),
-    );
-    Promise.race([initMegaStorage(), megaTimeout])
+    // تهيئة Mega Storage في الخلفية (initMegaStorage يحتوي على timeout داخلي)
+    initMegaStorage()
       .then(() => console.log('✅ Mega Storage جاهز لرفع المرفقات'))
       .catch((err) => console.error('⚠️ تعذر الاتصال بـ Mega - رفع المرفقات لن يعمل:', err.message));
   });

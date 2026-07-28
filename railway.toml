@@ -3,7 +3,7 @@ builder = "nixpacks"
 buildCommand = "npm install && npm run build"
 
 [deploy]
-startCommand = "npm start"
+startCommand = "npm start -w @lexpro/server"
 healthcheckPath = "/api/version"
 healthcheckTimeout = 30
 

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { initMegaStorage } from '../services/mega';
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
@@ -18,13 +17,7 @@ export async function connectDatabase(): Promise<void> {
       connectTimeoutMS: 10000,
     });
     console.log('✅ MongoDB متصل');
-
-    // Mega اختياري — لا يتعطل الخادم إذا فشل
-    try {
-      await initMegaStorage();
-    } catch (megaErr) {
-      console.warn('⚠️ تعذر الاتصال بـ Mega — رفع الملفات لن يعمل:', (megaErr as Error).message);
-    }
+    // Mega يُهيأ في الخلفية من index.ts بعد بدء الخادم
   } catch (error) {
     console.error('❌ خطأ في الاتصال بـ MongoDB:', error);
     process.exit(1);

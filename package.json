@@ -14,6 +14,7 @@
     "dev:server": "npm run dev -w @lexpro/server",
     "dev:renderer": "npm run dev -w @lexpro/renderer",
     "dev:main": "wait-on http://localhost:5173 && scripts\\start-main.cmd",
+    "start": "npm start -w @lexpro/server",
     "build": "npm run build:renderer && npm run build:server && npm run build:main",
     "build:renderer": "npm run build -w @lexpro/renderer",
     "build:server": "npm run build -w @lexpro/server",

@@ -30,6 +30,11 @@ function getMega(): any {
 }
 
 export function initMegaStorage(): Promise<void> {
+  // تخطي إعادة التهيئة إذا كان الاتصال جاهزاً
+  if (storage) {
+    return Promise.resolve();
+  }
+
   return new Promise((resolve, reject) => {
     const email = process.env.MEGA_EMAIL;
     const password = process.env.MEGA_PASSWORD;
@@ -40,10 +45,18 @@ export function initMegaStorage(): Promise<void> {
     }
 
     const m = getMega();
+
+    // timeout لمنع تعليق الخادم إذا لم يستجب Mega
+    const timeout = setTimeout(() => {
+      reject(new Error('انتهت مهلة الاتصال بـ Mega (15 ثانية)'));
+    }, 15000);
+
     storage = new m.Storage(
       { email, password, autoload: true },
       (err: Error | null) => {
+        clearTimeout(timeout);
         if (err) {
+          storage = null;
           console.error('❌ خطأ في الاتصال بـ Mega:', err.message);
           reject(err);
         } else {
