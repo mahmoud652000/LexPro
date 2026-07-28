@@ -22,6 +22,9 @@
     "lint": "eslint packages/*/src --ext .ts,.tsx"
   },
   "author": "Mahmoud",
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "electron-updater": "^6.8.9"
   },
