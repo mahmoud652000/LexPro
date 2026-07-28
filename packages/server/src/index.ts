@@ -1,3 +1,8 @@
+// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
+if (!(globalThis as any).crypto) {
+  (globalThis as any).crypto = require('crypto').webcrypto;
+}
+
 import dotenv from 'dotenv';
 import path from 'path';
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
