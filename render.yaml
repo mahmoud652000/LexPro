@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: lexpro-server
+    env: node
+    rootDirectory: packages/server
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/version
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: PORT
+        value: 3001
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: MEGA_EMAIL
+        value: amrmansour8374@gmail.com
+      - key: MEGA_PASSWORD
+        sync: false
+      - key: CLIENT_URL
+        value: '*'
