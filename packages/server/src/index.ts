@@ -102,16 +102,21 @@ async function cleanupOldActivityLogs(): Promise<void> {
 // Start server
 async function start(): Promise<void> {
   await connectDatabase();
-  try {
-    await initMegaStorage();
-  } catch (err) {
-    console.error('⚠️ تعذر الاتصال بـ Mega - رفع المرفقات لن يعمل:', (err as Error).message);
-  }
   await seedAdmin();
   await cleanupOldActivityLogs();
   setInterval(cleanupOldActivityLogs, 60 * 60 * 1000);
+
+  // تشغيل السيرفر أولاً ثم تهيئة Mega في الخلفية
   server.listen(PORT, () => {
     console.log(`🚀 خادم LEX PRO يعمل على المنفذ ${PORT}`);
+
+    // تهيئة Mega Storage في الخلفية (مع timeout)
+    const megaTimeout = new Promise<void>((_, reject) =>
+      setTimeout(() => reject(new Error('انتهت مهلة الاتصال بـ Mega')), 15000),
+    );
+    Promise.race([initMegaStorage(), megaTimeout])
+      .then(() => console.log('✅ Mega Storage جاهز لرفع المرفقات'))
+      .catch((err) => console.error('⚠️ تعذر الاتصال بـ Mega - رفع المرفقات لن يعمل:', err.message));
   });
 }
 
