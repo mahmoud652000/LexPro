@@ -67,55 +67,66 @@ function fixFilename(name: string): string {
 }
 
 export async function uploadFile(req: Request, res: Response): Promise<void> {
-  const file = req.file;
-  if (!file) {
-    res.status(400).json({ success: false, message: 'لم يتم إرسال ملف' });
-    return;
-  }
-
-  const st = getStorage();
-  const fixedName = fixFilename(file.originalname);
-
-  const uploadStream = st.upload({
-    name: fixedName,
-    size: file.size,
-  });
-
-  const readable = Readable.from(file.buffer);
-  readable.pipe(uploadStream);
-
-  uploadStream.on('complete', async (fileNode: any) => {
-    try {
-      const shareUrl = await fileNode.link();
-      const nodeId = fileNode.nodeId;
-
-      // حفظ مرجع في MongoDB
-      const FileReference = getFileReference();
-      const ref = await FileReference.create({
-        megaUrl: shareUrl,
-        nodeId,
-        fileName: fixedName,
-        fileSize: fileNode.size || file.size,
-      });
-
-      res.json({
-        success: true,
-        data: {
-          fileId: ref._id.toString(),
-          fileName: ref.fileName,
-          fileSize: ref.fileSize,
-          shareUrl,
-        },
-      });
-    } catch {
-      res.status(500).json({ success: false, message: 'تعذر حفظ مرجع الملف' });
+  try {
+    const file = req.file;
+    if (!file) {
+      res.status(400).json({ success: false, message: 'لم يتم إرسال ملف' });
+      return;
     }
-  });
 
-  uploadStream.on('error', (err: Error) => {
-    console.error('❌ خطأ في رفع الملف إلى Mega:', err.message);
-    res.status(500).json({ success: false, message: 'تعذر رفع الملف إلى Mega' });
-  });
+    const st = getStorage();
+    const fixedName = fixFilename(file.originalname);
+
+    const uploadStream = st.upload({
+      name: fixedName,
+      size: file.size,
+    });
+
+    const readable = Readable.from(file.buffer);
+    readable.pipe(uploadStream);
+
+    uploadStream.on('complete', async (fileNode: any) => {
+      try {
+        const shareUrl = await fileNode.link();
+        const nodeId = fileNode.nodeId;
+
+        // حفظ مرجع في MongoDB
+        const FileReference = getFileReference();
+        const ref = await FileReference.create({
+          megaUrl: shareUrl,
+          nodeId,
+          fileName: fixedName,
+          fileSize: fileNode.size || file.size,
+        });
+
+        res.json({
+          success: true,
+          data: {
+            fileId: ref._id.toString(),
+            fileName: ref.fileName,
+            fileSize: ref.fileSize,
+            shareUrl,
+          },
+        });
+      } catch {
+        if (!res.headersSent) {
+          res.status(500).json({ success: false, message: 'تعذر حفظ مرجع الملف' });
+        }
+      }
+    });
+
+    uploadStream.on('error', (err: Error) => {
+      console.error('❌ خطأ في رفع الملف إلى Mega:', err.message);
+      if (!res.headersSent) {
+        res.status(500).json({ success: false, message: 'تعذر رفع الملف إلى Mega' });
+      }
+    });
+  } catch (err) {
+    console.error('❌ خطأ في رفع الملف:', (err as Error).message);
+    if (!res.headersSent) {
+      res.status(500).json({ success: false, message: 'تعذر رفع الملف: ' + (err as Error).message });
+    }
+  }
 }
 
 export async function downloadFile(req: Request, res: Response): Promise<void> {
