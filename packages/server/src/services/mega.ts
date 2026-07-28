@@ -3,15 +3,27 @@ import { Readable } from 'stream';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
-// نستخدم node:crypto لضمان تحميل الوحدة المدمجة وليست حزمة npm
+// Polyfill: Node.js < 20 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
+// على Node.js 20+ يكون متاحاً أصلياً
 function ensureCryptoPolyfill(): void {
-  if (!(globalThis as any).crypto) {
-    const nodeCrypto = require('node:crypto');
-    if (nodeCrypto.webcrypto) {
-      (globalThis as any).crypto = nodeCrypto.webcrypto;
-    }
+  if ((globalThis as any).crypto) return;
+
+  const nodeCrypto = require('node:crypto');
+
+  // Node.js 18: webcrypto متاح كـ experimental
+  if (nodeCrypto.webcrypto) {
+    (globalThis as any).crypto = nodeCrypto.webcrypto;
+    return;
   }
+
+  // Fallback أخير: polyfill يدوي باستخدام randomBytes
+  (globalThis as any).crypto = {
+    getRandomValues: (arr: Uint8Array) => {
+      const bytes = nodeCrypto.randomBytes(arr.length);
+      arr.set(bytes);
+      return arr;
+    },
+  };
 }
 ensureCryptoPolyfill();
 

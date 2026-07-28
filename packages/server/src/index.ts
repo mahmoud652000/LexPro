@@ -1,9 +1,16 @@
-// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
-// نستخدم node:crypto لضمان تحميل الوحدة المدمجة
+// Polyfill: Node.js < 20 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
 if (!(globalThis as any).crypto) {
   const nodeCrypto = require('node:crypto');
   if (nodeCrypto.webcrypto) {
     (globalThis as any).crypto = nodeCrypto.webcrypto;
+  } else {
+    (globalThis as any).crypto = {
+      getRandomValues: (arr: Uint8Array) => {
+        const bytes = nodeCrypto.randomBytes(arr.length);
+        arr.set(bytes);
+        return arr;
+      },
+    };
   }
 }
 
