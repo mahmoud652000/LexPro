@@ -1,6 +1,10 @@
 // Polyfill: Node.js 18 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
+// نستخدم node:crypto لضمان تحميل الوحدة المدمجة
 if (!(globalThis as any).crypto) {
-  (globalThis as any).crypto = require('crypto').webcrypto;
+  const nodeCrypto = require('node:crypto');
+  if (nodeCrypto.webcrypto) {
+    (globalThis as any).crypto = nodeCrypto.webcrypto;
+  }
 }
 
 import dotenv from 'dotenv';

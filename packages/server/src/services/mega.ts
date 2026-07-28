@@ -3,10 +3,17 @@ import { Readable } from 'stream';
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto
-if (!(globalThis as any).crypto) {
-  (globalThis as any).crypto = require('crypto').webcrypto;
+// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto (مطلوب لـ megajs)
+// نستخدم node:crypto لضمان تحميل الوحدة المدمجة وليست حزمة npm
+function ensureCryptoPolyfill(): void {
+  if (!(globalThis as any).crypto) {
+    const nodeCrypto = require('node:crypto');
+    if (nodeCrypto.webcrypto) {
+      (globalThis as any).crypto = nodeCrypto.webcrypto;
+    }
+  }
 }
+ensureCryptoPolyfill();
 
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
@@ -23,7 +30,8 @@ let storage: any = null;
 
 function getMega(): any {
   if (!mega) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // ضمان وجود polyfill قبل تحميل megajs
+    ensureCryptoPolyfill();
     mega = require('megajs');
   }
   return mega;
