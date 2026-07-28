@@ -11,3 +11,4 @@ healthcheckTimeout = 30
 PORT = "3001"
 MEGA_EMAIL = "amrmansour8374@gmail.com"
 MEGA_PASSWORD = "amrAMR000"
+NIXPACKS_NODE_VERSION = "20"
