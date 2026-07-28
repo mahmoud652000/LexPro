@@ -2,7 +2,8 @@
   "appId": "com.lexpro.app",
   "productName": "LEX PRO",
   "directories": {
-    "output": "dist-electron"
+    "output": "dist-electron",
+    "app": "."
   },
   "publish": [
     {
@@ -15,18 +16,32 @@
   ],
   "files": [
     "packages/main/dist/**/*",
+    "packages/main/node_modules/**/*",
     "packages/renderer/dist/**/*",
     "packages/server/dist/**/*",
-    "node_modules/**/*"
+    "node_modules/**/*",
+    "build/icon.ico",
+    "package.json"
   ],
+  "extraMetadata": {
+    "main": "packages/main/dist/index.js"
+  },
   "win": {
     "target": "nsis",
-    "icon": "build/icon.ico"
+    "icon": "build/icon.ico",
+    "signAndEditExecutable": false
   },
+  "electronDist": "node_modules/electron/dist",
   "nsis": {
     "oneClick": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
-    "shortcutName": "LEX PRO"
+    "createStartMenuShortcut": true,
+    "shortcutName": "LEX PRO",
+    "installerLanguages": ["ar_SA"],
+    "installerIcon": "build/icon.ico",
+    "uninstallerIcon": "build/icon.ico",
+    "installerHeaderIcon": "build/icon.ico",
+    "deleteAppDataOnUninstall": false
   }
 }

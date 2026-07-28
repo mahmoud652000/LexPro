@@ -19,7 +19,12 @@ export async function connectDatabase(): Promise<void> {
     });
     console.log('✅ MongoDB متصل');
 
-    await initMegaStorage();
+    // Mega اختياري — لا يتعطل الخادم إذا فشل
+    try {
+      await initMegaStorage();
+    } catch (megaErr) {
+      console.warn('⚠️ تعذر الاتصال بـ Mega — رفع الملفات لن يعمل:', (megaErr as Error).message);
+    }
   } catch (error) {
     console.error('❌ خطأ في الاتصال بـ MongoDB:', error);
     process.exit(1);

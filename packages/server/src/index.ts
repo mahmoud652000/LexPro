@@ -11,6 +11,7 @@ import { connectDatabase } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import routes from './routes';
 import { User, ActivityLog } from './models';
+import { initMegaStorage } from './services/mega';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -101,6 +102,11 @@ async function cleanupOldActivityLogs(): Promise<void> {
 // Start server
 async function start(): Promise<void> {
   await connectDatabase();
+  try {
+    await initMegaStorage();
+  } catch (err) {
+    console.error('⚠️ تعذر الاتصال بـ Mega - رفع المرفقات لن يعمل:', (err as Error).message);
+  }
   await seedAdmin();
   await cleanupOldActivityLogs();
   setInterval(cleanupOldActivityLogs, 60 * 60 * 1000);

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { HashRouter } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import arEG from 'antd/locale/ar_EG';
 import App from './App';
@@ -34,9 +34,9 @@ const theme = {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ConfigProvider locale={arEG} theme={theme} direction="rtl">
-      <BrowserRouter>
+      <HashRouter>
         <App />
-      </BrowserRouter>
+      </HashRouter>
     </ConfigProvider>
   </React.StrictMode>
 );

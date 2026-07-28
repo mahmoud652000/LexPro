@@ -17,7 +17,7 @@ const roleColors: Record<string, string> = {
   secretary: '#27ae60',
 };
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = 'https://lexpro-production-9267.up.railway.app/api';
 
 export default function Profile() {
   const { user, setUser, setToken } = useAuthStore();

@@ -528,7 +528,7 @@ export default function CustomerDossier() {
       const uploadRes = await api.post('/files/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-      const fileId = uploadRes.data?.id || uploadRes.data?.fileId || uploadRes.data?._id;
+      const fileId = uploadRes.data?.data?.fileId;
       await api.post('/customer-documents', {
         customerId: selectedCustomerId,
         name: file.name,

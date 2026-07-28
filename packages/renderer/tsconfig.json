@@ -13,12 +13,8 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@lexpro/shared": ["../shared/src"],
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*"],
-  "references": [
-    { "path": "../shared" }
-  ]
+  "include": ["src/**/*"]
 }

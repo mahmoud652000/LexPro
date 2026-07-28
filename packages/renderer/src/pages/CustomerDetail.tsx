@@ -200,8 +200,7 @@ export default function CustomerDetail() {
     setUploading(true);
     try {
       const uploadRes = await fileApi.upload(file);
-      const fileId =
-        uploadRes.data?.id || uploadRes.data?.fileId || uploadRes.data?._id;
+      const fileId = uploadRes.data?.data?.fileId;
       await api.post('/customer-documents', {
         customerId: id,
         name: file.name,

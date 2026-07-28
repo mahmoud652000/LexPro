@@ -6,6 +6,12 @@ import * as fs from 'fs';
 let mainWindow: BrowserWindow | null = null;
 
 function createWindow(): void {
+  const isDev = !app.isPackaged;
+
+  const iconPath = isDev
+    ? path.join(__dirname, '..', '..', '..', 'build', 'icon.ico')
+    : path.join(process.resourcesPath, 'app', 'build', 'icon.ico');
+
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -13,7 +19,7 @@ function createWindow(): void {
     minHeight: 700,
     show: false,
     title: 'LEX PRO - نظام إدارة مكاتب المحاماة',
-    icon: path.join(__dirname, '..', '..', '..', 'build', 'icon.ico'),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -23,9 +29,6 @@ function createWindow(): void {
     },
   });
 
-  // في وضع التطوير، حمّل من Vite dev server
-  const isDev = !app.isPackaged;
-
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
   } else {
@@ -34,7 +37,9 @@ function createWindow(): void {
 
   mainWindow.once('ready-to-show', () => {
     mainWindow?.show();
-    mainWindow?.webContents.openDevTools();
+    if (isDev) {
+      mainWindow?.webContents.openDevTools();
+    }
   });
 
   // فتح الروابط الخارجية في المتصفح، السماح بروابط الملفات المحلية
@@ -254,63 +259,71 @@ function initAutoUpdater(): void {
     return;
   }
 
-  autoUpdater.autoDownload = true;
-  autoUpdater.autoInstallOnAppQuit = true;
+  // التحقق من وجود ملف app-update.yml قبل محاولة التحديث
+  const updateConfigPath = path.join(process.resourcesPath, 'app-update.yml');
+  if (!fs.existsSync(updateConfigPath)) {
+    console.warn('[autoUpdater] ملف app-update.yml غير موجود - يتم تخطي التحديث التلقائي');
+    return;
+  }
 
-  autoUpdater.on('checking-for-update', () => {
-    mainWindow?.webContents.send('update-status', { event: 'checking-for-update' });
-  });
+  try {
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('update-available', (info) => {
-    mainWindow?.webContents.send('update-status', {
-      event: 'update-available',
-      version: info.version,
+    autoUpdater.on('checking-for-update', () => {
+      mainWindow?.webContents.send('update-status', { event: 'checking-for-update' });
     });
-  });
 
-  autoUpdater.on('update-not-available', () => {
-    mainWindow?.webContents.send('update-status', { event: 'update-not-available' });
-  });
-
-  autoUpdater.on('download-progress', (progress) => {
-    mainWindow?.webContents.send('update-status', {
-      event: 'download-progress',
-      percent: progress.percent,
+    autoUpdater.on('update-available', (info) => {
+      mainWindow?.webContents.send('update-status', {
+        event: 'update-available',
+        version: info.version,
+      });
     });
-  });
 
-  autoUpdater.on('update-downloaded', (info) => {
-    mainWindow?.webContents.send('update-status', {
-      event: 'update-downloaded',
-      version: info.version,
+    autoUpdater.on('update-not-available', () => {
+      mainWindow?.webContents.send('update-status', { event: 'update-not-available' });
     });
-  });
 
-  autoUpdater.on('error', (err) => {
-    mainWindow?.webContents.send('update-status', {
-      event: 'error',
-      message: err?.message ?? String(err),
+    autoUpdater.on('download-progress', (progress) => {
+      mainWindow?.webContents.send('update-status', {
+        event: 'download-progress',
+        percent: progress.percent,
+      });
     });
-  });
 
-  ipcMain.handle('check-for-updates', async () => {
-    try {
-      const result = await autoUpdater.checkForUpdates();
-      return { success: true, updateAvailable: !!result?.updateInfo };
-    } catch (err) {
-      return { success: false, message: (err as Error).message };
-    }
-  });
-
-  ipcMain.handle('install-update', () => {
-    autoUpdater.quitAndInstall(false, true);
-  });
-
-  setTimeout(() => {
-    autoUpdater.checkForUpdates().catch((err) => {
-      console.error('[autoUpdater] فشل الفحص:', err);
+    autoUpdater.on('update-downloaded', (info) => {
+      mainWindow?.webContents.send('update-status', {
+        event: 'update-downloaded',
+        version: info.version,
+      });
     });
-  }, 3000);
+
+    autoUpdater.on('error', (err) => {
+      console.error('[autoUpdater] خطأ:', err?.message ?? String(err));
+    });
+
+    ipcMain.handle('check-for-updates', async () => {
+      try {
+        const result = await autoUpdater.checkForUpdates();
+        return { success: true, updateAvailable: !!result?.updateInfo };
+      } catch (err) {
+        return { success: false, message: (err as Error).message };
+      }
+    });
+
+    ipcMain.handle('install-update', () => {
+      autoUpdater.quitAndInstall(false, true);
+    });
+
+    setTimeout(() => {
+      autoUpdater.checkForUpdates().catch((err) => {
+        console.error('[autoUpdater] فشل الفحص:', err);
+      });
+    }, 3000);
+  } catch (err) {
+    console.error('[autoUpdater] تعذر تهيئة التحديث التلقائي:', err);
+  }
 }
 
 app.whenReady().then(() => {

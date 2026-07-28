@@ -9,3 +9,5 @@ healthcheckTimeout = 30
 
 [deploy.envVariables]
 PORT = "3001"
+MEGA_EMAIL = "amrmansour8374@gmail.com"
+MEGA_PASSWORD = "amrAMR000"

@@ -6,7 +6,7 @@ import { chatApi } from '../api/client';
 import { useAuthStore } from '../store/auth';
 import dayjs from 'dayjs';
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = 'https://lexpro-production-9267.up.railway.app';
 
 const roleLabels: Record<string, string> = {
   admin: 'مدير',

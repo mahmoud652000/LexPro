@@ -5,7 +5,7 @@ import { io as ioClient, Socket } from 'socket.io-client';
 import { activityApi } from '../api/client';
 import dayjs from 'dayjs';
 
-const SOCKET_URL = 'http://localhost:3001';
+const SOCKET_URL = 'https://lexpro-production-9267.up.railway.app';
 
 const actionColors: Record<string, string> = {
   create: 'green',

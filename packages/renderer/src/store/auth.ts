@@ -13,6 +13,7 @@ interface AuthUser {
   name: string;
   username: string;
   role: string;
+  avatar?: string;
   permissions: Permission[];
 }
 

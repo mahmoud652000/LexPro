@@ -26,8 +26,8 @@ import {
 import { useAuthStore } from '../store/auth';
 import { ActivityBell } from './ActivityBell';
 import { Chat } from './Chat';
-import logoFull from '/logo.svg';
-import logoIcon from '/logo-icon.svg';
+import logoFull from '../../public/logo.svg';
+import logoIcon from '../../public/logo-icon.svg';
 
 const { Sider, Header, Content } = AntLayout;
 
@@ -319,8 +319,8 @@ export function Layout() {
                   style={{
                     background: roleColors[user.role] || '#2c3e50',
                     fontSize: 14,
-                    size: 32,
                   }}
+                  size={32}
                   icon={!user.avatar && <UserOutlined />}
                 >
                   {!user.avatar && (user.name?.charAt(0) || '؟')}
