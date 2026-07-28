@@ -3,6 +3,11 @@ import { Readable } from 'stream';
 import dotenv from 'dotenv';
 import path from 'path';
 
+// Polyfill: Node.js 18 لا يحتوي على globalThis.crypto
+if (!(globalThis as any).crypto) {
+  (globalThis as any).crypto = require('crypto').webcrypto;
+}
+
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // lazy import لتجنب الاعتماد الدائري مع models
