@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { UpdateNotification } from './components/UpdateNotification';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { useAuthStore } from './store/auth';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
@@ -42,29 +43,29 @@ export default function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route element={<ProtectedLayout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/customers" element={<Customers />} />
-        <Route path="/customers/:id" element={<CustomerDetail />} />
-        <Route path="/cases" element={<Cases />} />
-        <Route path="/cases/:id" element={<CaseDetail />} />
-        <Route path="/sessions" element={<Sessions />} />
-        <Route path="/announcements" element={<Announcements />} />
-        <Route path="/tasks" element={<Tasks />} />
-        <Route path="/fees" element={<Fees />} />
-        <Route path="/fees/:id" element={<FeeDetail />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/customer-dossier" element={<CustomerDossier />} />
-        <Route path="/court-dossier" element={<CourtDossier />} />
-        <Route path="/notifications" element={<Notifications />} />
-        <Route path="/templates" element={<Templates />} />
-        <Route path="/recycle-bin" element={<RecycleBin />} />
-        <Route path="/settings/courts" element={<Courts />} />
-        <Route path="/settings/case-types" element={<CaseTypes />} />
-        <Route path="/settings/announcement-types" element={<AnnouncementTypes />} />
-        <Route path="/settings/lawyer-profile" element={<LawyerProfile />} />
-        <Route path="/settings/backup" element={<Backup />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/" element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+        <Route path="/customers" element={<ErrorBoundary><Customers /></ErrorBoundary>} />
+        <Route path="/customers/:id" element={<ErrorBoundary><CustomerDetail /></ErrorBoundary>} />
+        <Route path="/cases" element={<ErrorBoundary><Cases /></ErrorBoundary>} />
+        <Route path="/cases/:id" element={<ErrorBoundary><CaseDetail /></ErrorBoundary>} />
+        <Route path="/sessions" element={<ErrorBoundary><Sessions /></ErrorBoundary>} />
+        <Route path="/announcements" element={<ErrorBoundary><Announcements /></ErrorBoundary>} />
+        <Route path="/tasks" element={<ErrorBoundary><Tasks /></ErrorBoundary>} />
+        <Route path="/fees" element={<ErrorBoundary><Fees /></ErrorBoundary>} />
+        <Route path="/fees/:id" element={<ErrorBoundary><FeeDetail /></ErrorBoundary>} />
+        <Route path="/expenses" element={<ErrorBoundary><Expenses /></ErrorBoundary>} />
+        <Route path="/customer-dossier" element={<ErrorBoundary><CustomerDossier /></ErrorBoundary>} />
+        <Route path="/court-dossier" element={<ErrorBoundary><CourtDossier /></ErrorBoundary>} />
+        <Route path="/notifications" element={<ErrorBoundary><Notifications /></ErrorBoundary>} />
+        <Route path="/templates" element={<ErrorBoundary><Templates /></ErrorBoundary>} />
+        <Route path="/recycle-bin" element={<ErrorBoundary><RecycleBin /></ErrorBoundary>} />
+        <Route path="/settings/courts" element={<ErrorBoundary><Courts /></ErrorBoundary>} />
+        <Route path="/settings/case-types" element={<ErrorBoundary><CaseTypes /></ErrorBoundary>} />
+        <Route path="/settings/announcement-types" element={<ErrorBoundary><AnnouncementTypes /></ErrorBoundary>} />
+        <Route path="/settings/lawyer-profile" element={<ErrorBoundary><LawyerProfile /></ErrorBoundary>} />
+        <Route path="/settings/backup" element={<ErrorBoundary><Backup /></ErrorBoundary>} />
+        <Route path="/users" element={<ErrorBoundary><Users /></ErrorBoundary>} />
+        <Route path="/profile" element={<ErrorBoundary><Profile /></ErrorBoundary>} />
         <Route path="*" element={<Navigate to="/" />} />
       </Route>
     </Routes>

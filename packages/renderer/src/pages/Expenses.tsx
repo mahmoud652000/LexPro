@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Table, Modal, Input, Select, Button, message, Row, Col, Card, Statistic, Popconfirm, Upload } from 'antd';
 import { PlusOutlined, DeleteOutlined, PaperClipOutlined, BookOutlined, EditOutlined } from '@ant-design/icons';
 import { createCrudApi, fileApi } from '../api/client';
@@ -30,6 +30,7 @@ interface CustomerRow {
 
 export default function Expenses() {
   const [allExpenses, setAllExpenses] = useState<any[]>([]);
+  const allExpensesRef = useRef<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
@@ -67,6 +68,7 @@ export default function Expenses() {
     try {
       const [expRes, custRes] = await Promise.all([expensesApi.getAll(), customersApi.getAll()]);
       setAllExpenses(expRes.data.data || expRes.data || []);
+      allExpensesRef.current = expRes.data.data || expRes.data || [];
       setCustomers(custRes.data.data || custRes.data || []);
     } catch { message.error('حدث خطأ'); }
     finally { setLoading(false); }
@@ -150,7 +152,14 @@ export default function Expenses() {
       });
       message.success('تمت الإضافة');
       setQuickForm({ ...quickForm, amount: '', description: '' });
-      fetchData();
+      await fetchData();
+      if (logCustomer) {
+        const customerId = logCustomer._id || logCustomer.customerId;
+        const filtered = allExpensesRef.current.filter(
+          (e: any) => e.customerId === customerId || e.customerId?._id === customerId
+        );
+        setLogExpenses([...filtered]);
+      }
     } catch { message.error('تعذر الإضافة'); }
     finally { setAdding(false); }
   };
@@ -203,8 +212,10 @@ export default function Expenses() {
     setDocsForExpense(expense);
     setDocsModalOpen(true);
     try {
-      const res = await expenseDocsApi.getById(expense._id);
-      setExpenseDocs(res.data.data || []);
+      const res = await expenseDocsApi.getAll();
+      const allDocs = res.data.data || [];
+      const filtered = allDocs.filter((d: any) => d.expenseId === expense._id || d.expenseId?.toString() === expense._id);
+      setExpenseDocs(filtered);
     } catch { setExpenseDocs([]); }
   };
 
@@ -273,6 +284,7 @@ export default function Expenses() {
     },
     {
       title: 'عدد المعاملات',
+      dataIndex: 'count',
       key: 'count',
       width: 120,
       render: (count: number) => <span style={{ fontWeight: 600 }}>{count}</span>,
