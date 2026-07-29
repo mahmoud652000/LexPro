@@ -12,12 +12,12 @@ services:
       - key: PORT
         value: 3001
       - key: MONGODB_URI
-        sync: false
+        value: mongodb+srv://amr:amr@cluster0.nh9dfgl.mongodb.net/lexpro?retryWrites=true&w=majority&appName=Cluster0
       - key: JWT_SECRET
-        sync: false
+        value: lexpro-jwt-secret-2024
       - key: MEGA_EMAIL
         value: amrmansour8374@gmail.com
       - key: MEGA_PASSWORD
-        sync: false
+        value: amrAMR000
       - key: CLIENT_URL
         value: '*'
