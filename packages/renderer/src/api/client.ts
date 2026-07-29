@@ -9,47 +9,62 @@ function getServerBaseUrl(): string {
   return 'http://localhost:3001/api';
 }
 
-const API_BASE_URL = getServerBaseUrl();
-
-// اشتقاق URL الخادم (بدون /api) لـ Socket.io
-export let SERVER_URL = API_BASE_URL.replace('/api', '');
-
 // تحديث عنوان الخادم عند تغيير IP
 export function setServerIp(ip: string): void {
   localStorage.setItem('lexpro_server_ip', ip);
-  SERVER_URL = `http://${ip}:3001`;
 }
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+// الحصول على URL الخادم الحالي
+export function getApiBaseUrl(): string {
+  return getServerBaseUrl();
+}
 
-// إرفاق token في كل طلب
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('lexpro_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+export function getServerUrl(): string {
+  return getServerBaseUrl().replace('/api', '');
+}
 
-// التعامل مع 401 (انتهاء الجلسة)
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('lexpro_token');
-      localStorage.removeItem('lexpro_user');
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
-      }
+// ديناميكي: URL الحالي
+export let SERVER_URL = getServerUrl();
+
+// إنشاء axios instance قابل للتحديث
+function createApi(baseURL: string) {
+  const instance = axios.create({
+    baseURL,
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  instance.interceptors.request.use((config) => {
+    const token = localStorage.getItem('lexpro_token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-    return Promise.reject(error);
-  }
-);
+    return config;
+  });
+
+  instance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (error.response?.status === 401) {
+        localStorage.removeItem('lexpro_token');
+        localStorage.removeItem('lexpro_user');
+        if (window.location.hash !== '#/login') {
+          window.location.hash = '#/login';
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  return instance;
+}
+
+// api ديناميكي — يقرأ الـ IP من localStorage عند كل طلب
+const api = {
+  get: (url: string, config?: any) => createApi(getApiBaseUrl()).get(url, config),
+  post: (url: string, data?: any, config?: any) => createApi(getApiBaseUrl()).post(url, data, config),
+  put: (url: string, data?: any, config?: any) => createApi(getApiBaseUrl()).put(url, data, config),
+  delete: (url: string, config?: any) => createApi(getApiBaseUrl()).delete(url, config),
+};
 
 // مسارات الملفات
 export const fileApi = {

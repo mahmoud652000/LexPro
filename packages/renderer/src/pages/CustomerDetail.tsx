@@ -148,7 +148,7 @@ export default function CustomerDetail() {
     if (!id) return;
     setLoadingDocuments(true);
     try {
-      const { data } = await api.get<CustomerDocument[]>(
+      const { data } = await api.get(
         `/customer-documents/${id}`,
       );
       setDocuments(Array.isArray(data) ? data : []);

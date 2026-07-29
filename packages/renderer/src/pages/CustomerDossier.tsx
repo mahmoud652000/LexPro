@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Col, Row, Statistic, Table, Tabs, Descriptions, Spin, Select, Button, Input, message, Typography, Space, Checkbox, Divider, Upload, List, Tag, Popconfirm } from 'antd';
 import { SearchOutlined, UserOutlined, FilePdfOutlined, PrinterOutlined, WhatsAppOutlined, ExportOutlined, PaperClipOutlined, DeleteOutlined, DownloadOutlined, InboxOutlined, EyeOutlined } from '@ant-design/icons';
-import api from '../api/client';
+import api, { getApiBaseUrl } from '../api/client';
 import { PageHeader } from '../components/PageHeader';
 
 const { Title } = Typography;
@@ -546,12 +546,12 @@ export default function CustomerDossier() {
   };
 
   const handleOpenDoc = (doc: any) => {
-    const url = `${api.defaults.baseURL}/files/${doc.fileId}`;
+    const url = `${getApiBaseUrl()}/files/${doc.fileId}`;
     window.open(url, '_blank');
   };
 
   const handleDownloadDoc = (doc: any) => {
-    const url = `${api.defaults.baseURL}/files/${doc.fileId}`;
+    const url = `${getApiBaseUrl()}/files/${doc.fileId}`;
     const a = document.createElement('a');
     a.href = url;
     a.download = doc.name || doc.fileName || 'file';
@@ -570,7 +570,7 @@ export default function CustomerDossier() {
   };
 
   const handleDocWhatsApp = (doc: any) => {
-    const url = `${api.defaults.baseURL}/files/${doc.fileId}`;
+    const url = `${getApiBaseUrl()}/files/${doc.fileId}`;
     const text = encodeURIComponent(`*مرفق من ملف الموكل*\n${doc.name || doc.fileName || ''}\n${url}`);
     const phone = dossier?.customer?.whatsappNumber?.replace(/[^0-9]/g, '') || '';
     const waUrl = phone ? `https://wa.me/${phone}?text=${text}` : `https://wa.me/?text=${text}`;
@@ -579,7 +579,7 @@ export default function CustomerDossier() {
 
   const handleDocPrint = (doc: any) => {
     const type = getFileType(doc.name || doc.fileName || '');
-    const url = `${api.defaults.baseURL}/files/${doc.fileId}`;
+    const url = `${getApiBaseUrl()}/files/${doc.fileId}`;
     if (type === 'pdf' || type === 'image') {
       const printWin = window.open(url, '_blank');
       if (printWin) {

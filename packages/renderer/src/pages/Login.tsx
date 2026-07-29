@@ -28,7 +28,7 @@ export default function Login() {
       setUser(user);
       setUserName(user.name);
       setSuccess(true);
-      setTimeout(() => window.location.href = '/', 2400);
+      setTimeout(() => navigate('/'), 2400);
     } catch (err: any) {
       const msg = err.response?.data?.message || 'تعذر الاتصال بالخادم — تحقق من IP';
       message.error(msg);
