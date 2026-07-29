@@ -5,7 +5,7 @@ buildCommand = "npm install && npm run build -w @lexpro/server"
 [deploy]
 startCommand = "npm start -w @lexpro/server"
 healthcheckPath = "/api/version"
-healthcheckTimeout = 30
+healthcheckTimeout = 60
 
 [deploy.envVariables]
 PORT = "3001"

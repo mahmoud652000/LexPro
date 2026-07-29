@@ -20,6 +20,6 @@ export async function connectDatabase(): Promise<void> {
     // Mega يُهيأ في الخلفية من index.ts بعد بدء الخادم
   } catch (error) {
     console.error('❌ خطأ في الاتصال بـ MongoDB:', error);
-    process.exit(1);
+    throw error;
   }
 }

@@ -116,14 +116,19 @@ async function cleanupOldActivityLogs(): Promise<void> {
 
 // Start server
 async function start(): Promise<void> {
-  await connectDatabase();
-  await seedAdmin();
-  await cleanupOldActivityLogs();
-  setInterval(cleanupOldActivityLogs, 60 * 60 * 1000);
-
-  // تشغيل السيرفر أولاً ثم تهيئة Mega في الخلفية
+  // تشغيل السيرفر أولاً لاجتياز healthcheck ثم تهيئة قاعدة البيانات في الخلفية
   server.listen(PORT, () => {
     console.log(`🚀 خادم LEX PRO يعمل على المنفذ ${PORT}`);
+
+    // تهيئة قاعدة البيانات في الخلفية
+    connectDatabase()
+      .then(async () => {
+        await seedAdmin();
+        await cleanupOldActivityLogs();
+        setInterval(cleanupOldActivityLogs, 60 * 60 * 1000);
+        console.log('✅ قاعدة البيانات جاهزة');
+      })
+      .catch((err) => console.error('❌ تعذر الاتصال بقاعدة البيانات:', err.message));
 
     // تهيئة Mega Storage في الخلفية (initMegaStorage يحتوي على timeout داخلي)
     initMegaStorage()
