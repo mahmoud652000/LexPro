@@ -22,6 +22,7 @@ import {
   TeamOutlined,
   LogoutOutlined,
   UserOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../store/auth';
 import { ActivityBell } from './ActivityBell';
@@ -42,6 +43,7 @@ const allMenuItems = [
   { key: '/customer-dossier', icon: <SolutionOutlined />, label: 'ملف الموكل الشامل', module: 'customers' },
   { key: '/court-dossier', icon: <BankOutlined />, label: 'ملف المحكمة', module: 'cases' },
   { key: '/templates', icon: <FileTextOutlined />, label: 'النماذج', module: 'templates' },
+  { key: '/recycle-bin', icon: <DeleteOutlined />, label: 'سلة المحذوفات', module: 'settings' },
   { key: '/settings/backup', icon: <DatabaseOutlined />, label: 'النسخ الاحتياطي', module: 'backup' },
   {
     key: 'accounts',

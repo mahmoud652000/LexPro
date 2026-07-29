@@ -60,7 +60,10 @@ export const fileApi = {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
-  getUrl: (id: string) => `${API_BASE_URL}/files/${id}`,
+  getUrl: (id: string) => {
+    const ip = localStorage.getItem('lexpro_server_ip') || 'localhost';
+    return `http://${ip}:3001/api/files/${id}`;
+  },
 };
 
 // مسارات المصادقة
@@ -97,6 +100,14 @@ export const chatApi = {
   getConversations: () => api.get('/messages/conversations'),
   getMessages: (userId: string) => api.get(`/messages/${userId}`),
   sendMessage: (receiverId: string, text: string) => api.post('/messages', { receiverId, text }),
+};
+
+// مسارات سلة المحذوفات
+export const recycleBinApi = {
+  getAll: () => api.get('/recycle-bin'),
+  restore: (id: string) => api.post(`/recycle-bin/${id}/restore`),
+  deletePermanent: (id: string) => api.delete(`/recycle-bin/${id}`),
+  empty: () => api.delete('/recycle-bin/empty/all'),
 };
 
 // مسارات عامة CRUD

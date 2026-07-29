@@ -15,7 +15,22 @@ if (!(globalThis as any).crypto) {
 }
 
 import dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+import fs from 'fs';
+
+// البحث عن .env في عدة مسارات محتملة (يدعم tsx و node العادي)
+const envPaths = [
+  path.join(process.cwd(), '.env'),
+  path.join(process.cwd(), 'packages', 'server', '.env'),
+  path.join(__dirname, '..', '.env'),
+  path.join(__dirname, '.env'),
+];
+for (const p of envPaths) {
+  if (fs.existsSync(p)) {
+    dotenv.config({ path: p });
+    break;
+  }
+}
 
 import express from 'express';
 import cors from 'cors';
@@ -25,7 +40,7 @@ import bcrypt from 'bcryptjs';
 import { connectDatabase } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import routes from './routes';
-import { User, ActivityLog } from './models';
+import { User, ActivityLog, DeletedItem } from './models';
 import { initStorage } from './services/storage';
 
 const app = express();
@@ -114,6 +129,19 @@ async function cleanupOldActivityLogs(): Promise<void> {
   }
 }
 
+// حذف عناصر سلة المحذوفات الأقدم من 48 ساعة كل ساعة
+async function cleanupRecycleBin(): Promise<void> {
+  try {
+    const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000);
+    const result = await DeletedItem.deleteMany({ createdAt: { $lt: cutoff } });
+    if (result.deletedCount > 0) {
+      console.log(`🗑️ تم حذف ${result.deletedCount} عنصر من سلة المحذوفات (منتهي الصلاحية)`);
+    }
+  } catch (err) {
+    console.error('خطأ في تنظيف سلة المحذوفات:', err);
+  }
+}
+
 // Start server
 async function start(): Promise<void> {
   // تشغيل السيرفر أولاً لاجتياز healthcheck ثم تهيئة قاعدة البيانات في الخلفية
@@ -125,7 +153,9 @@ async function start(): Promise<void> {
       .then(async () => {
         await seedAdmin();
         await cleanupOldActivityLogs();
+        await cleanupRecycleBin();
         setInterval(cleanupOldActivityLogs, 60 * 60 * 1000);
+        setInterval(cleanupRecycleBin, 60 * 60 * 1000);
         console.log('✅ قاعدة البيانات جاهزة');
       })
       .catch((err) => console.error('❌ تعذر الاتصال بقاعدة البيانات:', err.message));

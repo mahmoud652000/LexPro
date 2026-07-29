@@ -462,4 +462,19 @@ const fileReferenceSchema = new mongoose.Schema({
 
 export const FileReference = mongoose.model('FileReference', fileReferenceSchema);
 
+// ============================================
+// نموذج سلة المحذوفات (DeletedItem)
+// ============================================
+const deletedItemSchema = new mongoose.Schema({
+  collectionName: { type: String, required: true },
+  documentId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  documentData: { type: mongoose.Schema.Types.Mixed, required: true },
+  displayName: { type: String, required: true },
+  deletedBy: { type: String, default: '' },
+}, { timestamps: true });
+
+deletedItemSchema.index({ createdAt: -1 });
+
+export const DeletedItem = mongoose.model('DeletedItem', deletedItemSchema);
+
 export { MODULE_NAMES };

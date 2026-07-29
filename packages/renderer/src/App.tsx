@@ -18,6 +18,7 @@ import Courts from './pages/Courts';
 import CaseTypes from './pages/CaseTypes';
 import AnnouncementTypes from './pages/AnnouncementTypes';
 import Templates from './pages/Templates';
+import RecycleBin from './pages/RecycleBin';
 import LawyerProfile from './pages/LawyerProfile';
 import CustomerDossier from './pages/CustomerDossier';
 import CourtDossier from './pages/CourtDossier';
@@ -56,6 +57,7 @@ export default function App() {
         <Route path="/court-dossier" element={<CourtDossier />} />
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/templates" element={<Templates />} />
+        <Route path="/recycle-bin" element={<RecycleBin />} />
         <Route path="/settings/courts" element={<Courts />} />
         <Route path="/settings/case-types" element={<CaseTypes />} />
         <Route path="/settings/announcement-types" element={<AnnouncementTypes />} />

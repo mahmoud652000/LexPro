@@ -5,7 +5,7 @@ import {
   Customer, Court, CaseType, AnnouncementType, Case, CaseSession,
   CaseDocument, SessionDocument, CaseAnnouncement, AnnouncementDocument,
   CustomerDocument, DocumentTemplate, FeeAgreement, FeePayment, FeeHistory,
-  Expense, ExpenseDocument, LawyerProfile, SystemInfo, Task, User, ActivityLog, Message, FileReference, MODULE_NAMES,
+  Expense, ExpenseDocument, LawyerProfile, SystemInfo, Task, User, ActivityLog, Message, FileReference, DeletedItem, MODULE_NAMES,
 } from '../models';
 import { upload } from '../middleware/upload';
 import { uploadFile, downloadFile } from '../services/storage';
@@ -173,6 +173,23 @@ router.use(authMiddleware);
 router.use(activityLogger);
 
 // ============================================
+// دالة حفظ في سلة المحذوفات قبل الحذف
+// ============================================
+async function saveToRecycleBin(doc: any, collectionName: string, displayName: string, deletedBy: string = ''): Promise<void> {
+  try {
+    await DeletedItem.create({
+      collectionName,
+      documentId: doc._id,
+      documentData: doc.toObject(),
+      displayName,
+      deletedBy,
+    });
+  } catch (err) {
+    console.error('⚠️ تعذر حفظ العنصر في سلة المحذوفات:', (err as Error).message);
+  }
+}
+
+// ============================================
 // مسارات الملفات (File Routes)
 // ============================================
 router.post('/files/upload', upload.single('file'), uploadFile);
@@ -218,8 +235,11 @@ router.put('/courts/:id', async (req, res) => {
   catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 router.delete('/courts/:id', async (req, res) => {
-  try { await Court.findByIdAndDelete(req.params.id); res.json({ success: true }); }
-  catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+  try {
+    const item = await Court.findById(req.params.id);
+    if (item) { await saveToRecycleBin(item, 'Court', item.name); await Court.findByIdAndDelete(req.params.id); }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 
 // ============================================
@@ -238,8 +258,11 @@ router.put('/case-types/:id', async (req, res) => {
   catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 router.delete('/case-types/:id', async (req, res) => {
-  try { await CaseType.findByIdAndDelete(req.params.id); res.json({ success: true }); }
-  catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+  try {
+    const item = await CaseType.findById(req.params.id);
+    if (item) { await saveToRecycleBin(item, 'CaseType', item.name); await CaseType.findByIdAndDelete(req.params.id); }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 
 // ============================================
@@ -258,8 +281,11 @@ router.put('/announcement-types/:id', async (req, res) => {
   catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 router.delete('/announcement-types/:id', async (req, res) => {
-  try { await AnnouncementType.findByIdAndDelete(req.params.id); res.json({ success: true }); }
-  catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+  try {
+    const item = await AnnouncementType.findById(req.params.id);
+    if (item) { await saveToRecycleBin(item, 'AnnouncementType', item.name); await AnnouncementType.findByIdAndDelete(req.params.id); }
+    res.json({ success: true });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 
 // ============================================
@@ -287,7 +313,7 @@ router.put('/customers/:id', async (req, res) => {
 router.delete('/customers/:id', async (req, res) => {
   try {
     const item = await Customer.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'Customer', item.name); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -332,7 +358,7 @@ router.put('/cases/:id', async (req, res) => {
 router.delete('/cases/:id', async (req, res) => {
   try {
     const item = await Case.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'Case', `قضية ${item.caseNumber}/${item.caseYear}`); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -391,7 +417,7 @@ router.put('/sessions/:id', async (req, res) => {
 router.delete('/sessions/:id', async (req, res) => {
   try {
     const item = await CaseSession.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'CaseSession', `جلسة رقم ${item.sessionNumber}`); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -414,7 +440,7 @@ router.post('/case-documents', async (req, res) => {
 router.delete('/case-documents/:id', async (req, res) => {
   try {
     const item = await CaseDocument.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'CaseDocument', item.documentName); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -433,7 +459,7 @@ router.post('/session-documents', async (req, res) => {
 router.delete('/session-documents/:id', async (req, res) => {
   try {
     const item = await SessionDocument.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'SessionDocument', item.documentName); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -481,7 +507,7 @@ router.put('/announcements/:id', async (req, res) => {
 router.delete('/announcements/:id', async (req, res) => {
   try {
     const item = await CaseAnnouncement.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'CaseAnnouncement', `إعلان ${item.announcementNumber}`); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -500,7 +526,7 @@ router.post('/announcement-documents', async (req, res) => {
 router.delete('/announcement-documents/:id', async (req, res) => {
   try {
     const item = await AnnouncementDocument.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'AnnouncementDocument', item.documentName); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -519,7 +545,7 @@ router.post('/customer-documents', async (req, res) => {
 router.delete('/customer-documents/:id', async (req, res) => {
   try {
     const item = await CustomerDocument.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'CustomerDocument', item.documentName); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -542,7 +568,7 @@ router.put('/templates/:id', async (req, res) => {
 router.delete('/templates/:id', async (req, res) => {
   try {
     const item = await DocumentTemplate.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'DocumentTemplate', item.title); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -624,7 +650,7 @@ router.put('/fees/:id', async (req, res) => {
 router.delete('/fees/:id', async (req, res) => {
   try {
     const item = await FeeAgreement.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'FeeAgreement', `اتفاقية رسوم ${item.totalAmount}`); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -676,7 +702,7 @@ router.put('/expenses/:id', async (req, res) => {
 router.delete('/expenses/:id', async (req, res) => {
   try {
     const item = await Expense.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'Expense', `مصروف ${item.amount}`); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -695,7 +721,7 @@ router.post('/expense-documents', async (req, res) => {
 router.delete('/expense-documents/:id', async (req, res) => {
   try {
     const item = await ExpenseDocument.findById(req.params.id);
-    if (item) { await item.deleteOne(); }
+    if (item) { await saveToRecycleBin(item, 'ExpenseDocument', 'مستند مصروف'); await item.deleteOne(); }
     res.json({ success: true });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -1198,7 +1224,8 @@ router.put('/tasks/:id', async (req, res) => {
 });
 router.delete('/tasks/:id', async (req, res) => {
   try {
-    await Task.findByIdAndDelete(req.params.id);
+    const item = await Task.findById(req.params.id);
+    if (item) { await saveToRecycleBin(item, 'Task', item.title); await Task.findByIdAndDelete(req.params.id); }
     res.json({ success: true, message: 'تم الحذف' });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
@@ -1291,6 +1318,79 @@ router.post('/messages', authMiddleware, async (req: AuthRequest, res: Response)
     io.to(receiverId).emit('newMessage', populated);
 
     res.json({ success: true, data: populated });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+});
+
+// ============================================
+// مسارات سلة المحذوفات (Recycle Bin)
+// ============================================
+
+// خريطة أسماء المجموعات للنماذج
+const modelMap: Record<string, any> = {
+  Customer, Court, CaseType, AnnouncementType, Case, CaseSession,
+  CaseDocument, SessionDocument, CaseAnnouncement, AnnouncementDocument,
+  CustomerDocument, DocumentTemplate, FeeAgreement, Expense, Task,
+};
+
+// عرض محتويات سلة المحذوفات
+router.get('/recycle-bin', async (_req, res) => {
+  try {
+    const items = await DeletedItem.find().sort({ createdAt: -1 });
+    res.json({ success: true, data: items });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+});
+
+// استعادة عنصر من سلة المحذوفات
+router.post('/recycle-bin/:id/restore', async (req, res) => {
+  try {
+    const item = await DeletedItem.findById(req.params.id);
+    if (!item) {
+      res.status(404).json({ success: false, message: 'العنصر غير موجود في السلة' });
+      return;
+    }
+
+    const Model = modelMap[item.collectionName];
+    if (!Model) {
+      res.status(400).json({ success: false, message: 'نوع العنصر غير معروف' });
+      return;
+    }
+
+    // إزالة _id و__v من البيانات لإعادة الإدراج
+    const data = item.documentData;
+    delete data._id;
+    delete data.__v;
+
+    // التحقق من عدم وجود عنصر بنفس المعرف
+    const existing = await Model.findById(item.documentId);
+    if (existing) {
+      // العنصر موجود بالفعل، احذفه من السلة فقط
+      await DeletedItem.findByIdAndDelete(req.params.id);
+      res.json({ success: true, message: 'العنصر موجود بالفعل، تم حذفه من السلة' });
+      return;
+    }
+
+    // إعادة إنشاء المستند
+    data._id = item.documentId;
+    await Model.create(data);
+
+    await DeletedItem.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'تمت الاستعادة بنجاح' });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+});
+
+// حذف عنصر نهائياً من السلة
+router.delete('/recycle-bin/:id', async (req, res) => {
+  try {
+    await DeletedItem.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: 'تم الحذف النهائي' });
+  } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
+});
+
+// تفريغ السلة بالكامل
+router.delete('/recycle-bin/empty/all', async (_req, res) => {
+  try {
+    await DeletedItem.deleteMany({});
+    res.json({ success: true, message: 'تم تفريغ السلة' });
   } catch (err) { res.status(500).json({ success: false, message: (err as Error).message }); }
 });
 

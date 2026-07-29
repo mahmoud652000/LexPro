@@ -17,8 +17,6 @@ const roleColors: Record<string, string> = {
   secretary: '#27ae60',
 };
 
-const API_BASE_URL = 'https://lexpro-production-9267.up.railway.app/api';
-
 export default function Profile() {
   const { user, setUser, setToken } = useAuthStore();
   const [form] = Form.useForm();
@@ -58,7 +56,7 @@ export default function Profile() {
     try {
       const uploadRes = await fileApi.upload(file);
       const fileId = uploadRes.data.data?.fileId || uploadRes.data.fileId;
-      const avatarUrl = `${API_BASE_URL}/files/${fileId}`;
+      const avatarUrl = fileApi.getUrl(fileId);
       const res = await authApi.updateProfile({ avatar: avatarUrl });
       const { user: updatedUser, token: newToken } = res.data.data;
       setUser(updatedUser);
