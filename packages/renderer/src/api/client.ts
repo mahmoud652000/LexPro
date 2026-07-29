@@ -1,12 +1,16 @@
 import axios from 'axios';
 
-// اكتشاف IP الخادم تلقائياً: من env، أو نفس مضيف الصفحة، أو localhost
+// اكتشاف عنوان الخادم تلقائياً
 function getServerBaseUrl(): string {
   const envUrl = import.meta.env.VITE_API_URL;
   if (envUrl) return envUrl;
 
-  // في الإنتاج (Electron أو خادم محلي): استخدم نفس مضيف الصفحة
+  // في المتصفح: استخدم نفس مضيف الصفحة
   const host = window.location.hostname;
+  // في Electron المُجمَّع (file://): hostname فارغ، استخدم localhost
+  if (!host || host === 'localhost' || host === '127.0.0.1') {
+    return 'http://localhost:3001/api';
+  }
   return `http://${host}:3001/api`;
 }
 
