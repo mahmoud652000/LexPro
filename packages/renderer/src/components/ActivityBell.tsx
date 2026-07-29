@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Badge, Dropdown, List, Tag, Empty, Button } from 'antd';
 import { BellOutlined, CheckOutlined } from '@ant-design/icons';
 import { io as ioClient, Socket } from 'socket.io-client';
-import { activityApi } from '../api/client';
+import { activityApi, SERVER_URL } from '../api/client';
 import dayjs from 'dayjs';
 
-const SOCKET_URL = 'https://lexpro-production-9267.up.railway.app';
+const SOCKET_URL = SERVER_URL;
 
 const actionColors: Record<string, string> = {
   create: 'green',

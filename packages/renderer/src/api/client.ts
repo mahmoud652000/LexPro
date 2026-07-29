@@ -1,6 +1,19 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+// اكتشاف IP الخادم تلقائياً: من env، أو نفس مضيف الصفحة، أو localhost
+function getServerBaseUrl(): string {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+
+  // في الإنتاج (Electron أو خادم محلي): استخدم نفس مضيف الصفحة
+  const host = window.location.hostname;
+  return `http://${host}:3001/api`;
+}
+
+const API_BASE_URL = getServerBaseUrl();
+
+// اشتقاق URL الخادم (بدون /api) لـ Socket.io
+export const SERVER_URL = API_BASE_URL.replace('/api', '');
 
 const api = axios.create({
   baseURL: API_BASE_URL,

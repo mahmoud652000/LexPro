@@ -2,11 +2,11 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Drawer, Avatar, Badge, Input, Button, List, Spin, Empty, Tag } from 'antd';
 import { MessageOutlined, ArrowRightOutlined, SendOutlined, UserOutlined } from '@ant-design/icons';
 import { io as ioClient, Socket } from 'socket.io-client';
-import { chatApi } from '../api/client';
+import { chatApi, SERVER_URL } from '../api/client';
 import { useAuthStore } from '../store/auth';
 import dayjs from 'dayjs';
 
-const SOCKET_URL = 'https://lexpro-production-9267.up.railway.app';
+const SOCKET_URL = SERVER_URL;
 
 const roleLabels: Record<string, string> = {
   admin: 'مدير',

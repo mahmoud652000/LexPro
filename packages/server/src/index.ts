@@ -117,8 +117,8 @@ async function cleanupOldActivityLogs(): Promise<void> {
 // Start server
 async function start(): Promise<void> {
   // تشغيل السيرفر أولاً لاجتياز healthcheck ثم تهيئة قاعدة البيانات في الخلفية
-  server.listen(PORT, () => {
-    console.log(`🚀 خادم LEX PRO يعمل على المنفذ ${PORT}`);
+  server.listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`🚀 خادم LEX PRO يعمل على المنفذ ${PORT} (0.0.0.0)`);
 
     // تهيئة قاعدة البيانات في الخلفية
     connectDatabase()
