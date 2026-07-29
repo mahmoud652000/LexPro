@@ -26,7 +26,7 @@ import { connectDatabase } from './config/database';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import routes from './routes';
 import { User, ActivityLog } from './models';
-import { initMegaStorage } from './services/mega';
+import { initStorage } from './services/storage';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -130,10 +130,10 @@ async function start(): Promise<void> {
       })
       .catch((err) => console.error('❌ تعذر الاتصال بقاعدة البيانات:', err.message));
 
-    // تهيئة Mega Storage في الخلفية (initMegaStorage يحتوي على timeout داخلي)
-    initMegaStorage()
-      .then(() => console.log('✅ Mega Storage جاهز لرفع المرفقات'))
-      .catch((err) => console.error('⚠️ تعذر الاتصال بـ Mega - رفع المرفقات لن يعمل:', err.message));
+    // تهيئة مجلد التخزين المحلي
+    initStorage()
+      .then(() => console.log('✅ التخزين المحلي جاهز لرفع المرفقات'))
+      .catch((err) => console.error('⚠️ تعذر تهيئة التخزين المحلي:', err.message));
   });
 }
 

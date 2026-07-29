@@ -1,23 +1,24 @@
 import axios from 'axios';
 
-// اكتشاف عنوان الخادم تلقائياً
+// اكتشاف عنوان الخادم: من localStorage (IP الذي أدخله المستخدم) أو localhost
 function getServerBaseUrl(): string {
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) return envUrl;
-
-  // في المتصفح: استخدم نفس مضيف الصفحة
-  const host = window.location.hostname;
-  // في Electron المُجمَّع (file://): hostname فارغ، استخدم localhost
-  if (!host || host === 'localhost' || host === '127.0.0.1') {
-    return 'http://localhost:3001/api';
+  const savedIp = localStorage.getItem('lexpro_server_ip');
+  if (savedIp) {
+    return `http://${savedIp}:3001/api`;
   }
-  return `http://${host}:3001/api`;
+  return 'http://localhost:3001/api';
 }
 
 const API_BASE_URL = getServerBaseUrl();
 
 // اشتقاق URL الخادم (بدون /api) لـ Socket.io
-export const SERVER_URL = API_BASE_URL.replace('/api', '');
+export let SERVER_URL = API_BASE_URL.replace('/api', '');
+
+// تحديث عنوان الخادم عند تغيير IP
+export function setServerIp(ip: string): void {
+  localStorage.setItem('lexpro_server_ip', ip);
+  SERVER_URL = `http://${ip}:3001`;
+}
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -64,8 +65,10 @@ export const fileApi = {
 
 // مسارات المصادقة
 export const authApi = {
-  login: (username: string, password: string) =>
-    api.post('/auth/login', { username, password }),
+  login: (username: string, password: string) => {
+    const ip = localStorage.getItem('lexpro_server_ip') || 'localhost';
+    return axios.post(`http://${ip}:3001/api/auth/login`, { username, password });
+  },
   me: () => api.get('/auth/me'),
   updateProfile: (data: { name?: string; avatar?: string }) =>
     api.put('/auth/profile', data),

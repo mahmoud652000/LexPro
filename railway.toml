@@ -11,6 +11,4 @@ healthcheckTimeout = 60
 PORT = "3001"
 MONGODB_URI = "mongodb+srv://amr:amr@cluster0.nh9dfgl.mongodb.net/lexpro?retryWrites=true&w=majority&appName=Cluster0"
 JWT_SECRET = "lexpro-jwt-secret-2024"
-MEGA_EMAIL = "amrmansour8374@gmail.com"
-MEGA_PASSWORD = "amrAMR000"
 CLIENT_URL = "*"

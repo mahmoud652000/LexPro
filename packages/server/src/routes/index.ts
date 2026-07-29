@@ -8,7 +8,7 @@ import {
   Expense, ExpenseDocument, LawyerProfile, SystemInfo, Task, User, ActivityLog, Message, FileReference, MODULE_NAMES,
 } from '../models';
 import { upload } from '../middleware/upload';
-import { uploadFile, downloadFile } from '../services/mega';
+import { uploadFile, downloadFile } from '../services/storage';
 import { authMiddleware, requireRole, generateToken, AuthRequest, JWT_SECRET } from '../middleware/auth';
 import { activityLogger } from '../middleware/activityLogger';
 import jwt from 'jsonwebtoken';

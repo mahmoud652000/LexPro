@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, message } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { authApi } from '../api/client';
+import { UserOutlined, LockOutlined, GlobalOutlined } from '@ant-design/icons';
+import { authApi, setServerIp } from '../api/client';
 import { useAuthStore } from '../store/auth';
 
 export default function Login() {
@@ -11,19 +11,26 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [userName, setUserName] = useState('');
+  const [serverIp, setServerIpState] = useState(localStorage.getItem('lexpro_server_ip') || 'localhost');
 
-  const handleSubmit = async (values: { username: string; password: string }) => {
+  const handleSubmit = async (values: { username: string; password: string; serverIp: string }) => {
     setLoading(true);
     try {
+      // حفظ IP السيرفر قبل إرسال الطلب
+      const ip = values.serverIp.trim() || 'localhost';
+      setServerIp(ip);
+      setServerIpState(ip);
+
+      // إعادة إنشاء axios بالـ IP الجديد
       const res = await authApi.login(values.username, values.password);
       const { token, user } = res.data.data;
       setToken(token);
       setUser(user);
       setUserName(user.name);
       setSuccess(true);
-      setTimeout(() => navigate('/'), 2400);
+      setTimeout(() => window.location.href = '/', 2400);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'حدث خطأ أثناء تسجيل الدخول';
+      const msg = err.response?.data?.message || 'تعذر الاتصال بالخادم — تحقق من IP';
       message.error(msg);
     } finally {
       setLoading(false);
@@ -372,6 +379,25 @@ export default function Login() {
                   className="lp-input"
                   prefix={<LockOutlined style={{ color: '#C9A227', fontSize: 16 }} />}
                   placeholder="أدخل كلمة المرور"
+                  style={{
+                    height: 46,
+                    borderRadius: 12,
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    color: '#E8E8E8',
+                  }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="serverIp"
+                label={<span style={{ color: 'rgba(232,232,232,0.55)', fontSize: 13, fontWeight: 500 }}>عنوان السيرفر (IP)</span>}
+                initialValue={serverIp}
+              >
+                <Input
+                  className="lp-input"
+                  prefix={<GlobalOutlined style={{ color: '#C9A227', fontSize: 16 }} />}
+                  placeholder="localhost أو 192.168.1.100"
                   style={{
                     height: 46,
                     borderRadius: 12,

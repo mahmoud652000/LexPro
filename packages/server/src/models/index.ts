@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { deleteFile } from '../services/mega';
+import { deleteFile } from '../services/storage';
 
 // ============================================
 // نموذج المحامي (LawyerProfile)
@@ -450,10 +450,11 @@ messageSchema.index({ receiverId: 1, read: 1 });
 export const Message = mongoose.model('Message', messageSchema);
 
 // ============================================
-// نموذج مرجع الملف (FileReference) - يربط معرف قصير برابط Mega
+// نموذج مرجع الملف (FileReference) - يربط معرف قصير بالملف المحلي
 // ============================================
 const fileReferenceSchema = new mongoose.Schema({
-  megaUrl: { type: String, required: true },
+  filePath: { type: String, default: '' },
+  megaUrl: { type: String, default: '' },
   nodeId: { type: String, default: '' },
   fileName: { type: String, default: '' },
   fileSize: { type: Number, default: 0 },
