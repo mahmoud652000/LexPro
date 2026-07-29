@@ -1,9 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Table, Modal, Form, Input, Select, DatePicker, Button, message, Row, Col, Card, Statistic, Popconfirm, Upload } from 'antd';
-import { ShoppingCartOutlined, PlusOutlined, DeleteOutlined, PaperClipOutlined, BookOutlined } from '@ant-design/icons';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Table, Modal, Input, Select, Button, message, Row, Col, Card, Statistic, Popconfirm, Upload } from 'antd';
+import { PlusOutlined, DeleteOutlined, PaperClipOutlined, BookOutlined, EditOutlined } from '@ant-design/icons';
 import { createCrudApi, fileApi } from '../api/client';
 import { PageHeader } from '../components/PageHeader';
-import { AppModal } from '../components/AppModal';
 import dayjs from 'dayjs';
 
 const expensesApi = createCrudApi('/expenses');
@@ -20,11 +19,20 @@ const EXPENSE_CATEGORIES = [
   'أخرى',
 ];
 
+interface CustomerRow {
+  customerId: string;
+  customerName: string;
+  categories: string[];
+  totalAmount: number;
+  count: number;
+  expenses: any[];
+}
+
 export default function Expenses() {
-  const [data, setData] = useState<any[]>([]);
+  const [allExpenses, setAllExpenses] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
+  const [search, setSearch] = useState('');
 
   // نافذة اختيار الموكل
   const [selectCustomerOpen, setSelectCustomerOpen] = useState(false);
@@ -32,7 +40,8 @@ export default function Expenses() {
 
   // نافذة سجل المصروفات
   const [logOpen, setLogOpen] = useState(false);
-  const [customerExpenses, setCustomerExpenses] = useState<any[]>([]);
+  const [logCustomer, setLogCustomer] = useState<any>(null);
+  const [logExpenses, setLogExpenses] = useState<any[]>([]);
   const [logLoading, setLogLoading] = useState(false);
 
   // إضافة سريعة
@@ -44,6 +53,10 @@ export default function Expenses() {
   });
   const [adding, setAdding] = useState(false);
 
+  // تعديل مصروف
+  const [editingExpense, setEditingExpense] = useState<any>(null);
+  const [editForm, setEditForm] = useState({ amount: '', description: '', category: 'رسوم قضائية', expenseDate: '' });
+
   // مستندات المصروف
   const [docsModalOpen, setDocsModalOpen] = useState(false);
   const [docsForExpense, setDocsForExpense] = useState<any>(null);
@@ -53,7 +66,7 @@ export default function Expenses() {
     setLoading(true);
     try {
       const [expRes, custRes] = await Promise.all([expensesApi.getAll(), customersApi.getAll()]);
-      setData(expRes.data.data || expRes.data || []);
+      setAllExpenses(expRes.data.data || expRes.data || []);
       setCustomers(custRes.data.data || custRes.data || []);
     } catch { message.error('حدث خطأ'); }
     finally { setLoading(false); }
@@ -61,34 +74,67 @@ export default function Expenses() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  // تجميع المصروفات حسب الموكل
+  const groupedData: CustomerRow[] = useMemo(() => {
+    const map = new Map<string, CustomerRow>();
+    for (const exp of allExpenses) {
+      const custId = exp.customerId?._id || exp.customerId;
+      const custName = exp.customerName || exp.customerId?.name || 'غير محدد';
+      if (!map.has(custId)) {
+        map.set(custId, {
+          customerId: custId,
+          customerName: custName,
+          categories: [],
+          totalAmount: 0,
+          count: 0,
+          expenses: [],
+        });
+      }
+      const row = map.get(custId)!;
+      row.totalAmount += Number(exp.amount || 0);
+      row.count += 1;
+      row.expenses.push(exp);
+      if (exp.category && !row.categories.includes(exp.category)) {
+        row.categories.push(exp.category);
+      }
+    }
+    let result = Array.from(map.values());
+    if (search) {
+      result = result.filter((r) => r.customerName.includes(search));
+    }
+    return result;
+  }, [allExpenses, search]);
+
   const openAdd = () => {
     setSelectedCustomer(null);
     setSelectCustomerOpen(true);
   };
 
-  const openLog = async () => {
-    if (!selectedCustomer) {
+  const openLog = async (customer?: any) => {
+    const cust = customer || selectedCustomer;
+    if (!cust) {
       message.warning('يرجى اختيار موكل');
       return;
     }
     setSelectCustomerOpen(false);
+    setLogCustomer(cust);
     setLogOpen(true);
-    fetchCustomerExpenses(selectedCustomer._id);
+    fetchCustomerExpenses(cust._id || cust.customerId);
   };
 
   const fetchCustomerExpenses = async (customerId: string) => {
     setLogLoading(true);
     try {
-      const res = await expensesApi.getAll();
-      const all = res.data.data || res.data || [];
-      const filtered = all.filter((e: any) => e.customerId === customerId || e.customerId?._id === customerId);
-      setCustomerExpenses(filtered);
+      const filtered = allExpenses.filter(
+        (e: any) => e.customerId === customerId || e.customerId?._id === customerId
+      );
+      setLogExpenses(filtered);
     } catch { message.error('تعذر تحميل المصروفات'); }
     finally { setLogLoading(false); }
   };
 
   const handleQuickAdd = async () => {
-    if (!selectedCustomer) return;
+    if (!logCustomer) return;
     if (!quickForm.amount || Number(quickForm.amount) <= 0) {
       message.warning('أدخل مبلغاً صحيحاً');
       return;
@@ -96,7 +142,7 @@ export default function Expenses() {
     setAdding(true);
     try {
       await expensesApi.create({
-        customerId: selectedCustomer._id,
+        customerId: logCustomer._id || logCustomer.customerId,
         amount: quickForm.amount,
         description: quickForm.description || '—',
         category: quickForm.category,
@@ -104,7 +150,6 @@ export default function Expenses() {
       });
       message.success('تمت الإضافة');
       setQuickForm({ ...quickForm, amount: '', description: '' });
-      fetchCustomerExpenses(selectedCustomer._id);
       fetchData();
     } catch { message.error('تعذر الإضافة'); }
     finally { setAdding(false); }
@@ -114,7 +159,42 @@ export default function Expenses() {
     try {
       await expensesApi.delete(id);
       message.success('تم الحذف');
-      if (selectedCustomer) fetchCustomerExpenses(selectedCustomer._id);
+      fetchData();
+    } catch { message.error('تعذر الحذف'); }
+  };
+
+  const handleEditExpense = (expense: any) => {
+    setEditingExpense(expense);
+    setEditForm({
+      amount: String(expense.amount || ''),
+      description: expense.description || '',
+      category: expense.category || 'رسوم قضائية',
+      expenseDate: expense.expenseDate || dayjs().format('YYYY-MM-DD'),
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingExpense) return;
+    try {
+      await expensesApi.update(editingExpense._id, {
+        amount: editForm.amount,
+        description: editForm.description || '—',
+        category: editForm.category,
+        expenseDate: editForm.expenseDate,
+      });
+      message.success('تم التحديث');
+      setEditingExpense(null);
+      fetchData();
+    } catch { message.error('تعذر التحديث'); }
+  };
+
+  const handleDeleteCustomerExpenses = async (customerId: string) => {
+    const customerExps = allExpenses.filter(
+      (e: any) => e.customerId === customerId || e.customerId?._id === customerId
+    );
+    try {
+      await Promise.all(customerExps.map((e: any) => expensesApi.delete(e._id)));
+      message.success('تم حذف جميع مصروفات الموكل');
       fetchData();
     } catch { message.error('تعذر الحذف'); }
   };
@@ -155,17 +235,67 @@ export default function Expenses() {
     } catch { message.error('تعذر الحذف'); }
   };
 
-  const totalExpenses = customerExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
+  const totalExpenses = logExpenses.reduce((sum, e) => sum + Number(e.amount || 0), 0);
 
+  // أعمدة جدول العرض الرئيسي (مجمّع حسب الموكل)
   const columns = [
-    { title: 'الموكل', dataIndex: 'customerName' },
-    { title: 'القضية', dataIndex: 'caseNumber' },
-    { title: 'المبلغ', dataIndex: 'amount' },
-    { title: 'التاريخ', dataIndex: 'expenseDate' },
-    { title: 'الفئة', dataIndex: 'category' },
-    { title: 'البيان', dataIndex: 'description', ellipsis: true },
+    {
+      title: 'الموكل',
+      dataIndex: 'customerName',
+      key: 'customerName',
+      render: (name: string, record: CustomerRow) => (
+        <a
+          onClick={() => openLog(record)}
+          style={{ color: '#1890ff', cursor: 'pointer', fontWeight: 600 }}
+        >
+          {name}
+        </a>
+      ),
+    },
+    {
+      title: 'ملاحظات',
+      key: 'categories',
+      render: (_: any, record: CustomerRow) => (
+        <span style={{ fontSize: 13, color: '#999' }}>
+          {record.categories.join('، ')}
+        </span>
+      ),
+    },
+    {
+      title: 'إجمالي المصروفات',
+      key: 'totalAmount',
+      width: 160,
+      render: (_: any, record: CustomerRow) => (
+        <span style={{ color: '#27ae60', fontWeight: 700, fontSize: 15 }}>
+          {record.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })} ج.م
+        </span>
+      ),
+    },
+    {
+      title: 'عدد المعاملات',
+      key: 'count',
+      width: 120,
+      render: (count: number) => <span style={{ fontWeight: 600 }}>{count}</span>,
+    },
+    {
+      title: '',
+      key: 'actions',
+      width: 50,
+      render: (_: any, record: CustomerRow) => (
+        <Popconfirm
+          title="حذف جميع مصروفات هذا الموكل؟"
+          onConfirm={() => handleDeleteCustomerExpenses(record.customerId)}
+          okText="حذف"
+          cancelText="إلغاء"
+          okButtonProps={{ danger: true }}
+        >
+          <Button type="text" danger icon={<DeleteOutlined />} size="small" />
+        </Popconfirm>
+      ),
+    },
   ];
 
+  // أعمدة جدول سجل المصروفات
   const logColumns = [
     {
       title: 'تاريخ المصروف',
@@ -178,7 +308,6 @@ export default function Expenses() {
       dataIndex: 'category',
       key: 'category',
       width: 140,
-      render: (cat: string) => <span style={{ fontSize: 13 }}>{cat}</span>,
     },
     {
       title: 'البيان',
@@ -195,6 +324,19 @@ export default function Expenses() {
         <span style={{ color: '#c0392b', fontWeight: 600 }}>
           {Number(amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}
         </span>
+      ),
+    },
+    {
+      title: '',
+      key: 'edit',
+      width: 40,
+      render: (_: any, record: any) => (
+        <Button
+          type="text"
+          icon={<EditOutlined />}
+          size="small"
+          onClick={() => handleEditExpense(record)}
+        />
       ),
     },
     {
@@ -235,18 +377,17 @@ export default function Expenses() {
         subtitle="تسجيل مصاريف القضايا والموكلين"
         onAdd={openAdd}
         addLabel="إضافة +"
+        searchValue={search}
+        onSearch={setSearch}
       />
       <Table
         columns={columns}
-        dataSource={data}
-        rowKey="_id"
+        dataSource={groupedData}
+        rowKey="customerId"
         loading={loading}
         size="small"
-        rowSelection={{
-          selectedRowKeys,
-          onChange: (keys) => setSelectedRowKeys(keys),
-        }}
         pagination={{ pageSize: 10 }}
+        locale={{ emptyText: 'لا توجد مصروفات' }}
       />
 
       {/* نافذة اختيار الموكل */}
@@ -256,7 +397,7 @@ export default function Expenses() {
         title="اختيار موكل"
         footer={[
           <Button key="cancel" onClick={() => setSelectCustomerOpen(false)}>إلغاء</Button>,
-          <Button key="open" type="primary" onClick={openLog} disabled={!selectedCustomer}>
+          <Button key="open" type="primary" onClick={() => openLog()} disabled={!selectedCustomer}>
             فتح السجل
           </Button>,
         ]}
@@ -281,13 +422,16 @@ export default function Expenses() {
       {/* نافذة سجل المصروفات */}
       <Modal
         open={logOpen}
-        onCancel={() => setLogOpen(false)}
+        onCancel={() => {
+          setLogOpen(false);
+          setLogExpenses([]);
+        }}
         footer={null}
         width={800}
         title={
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <BookOutlined style={{ fontSize: 20, color: '#ea580c' }} />
-            <span>مصروفات — {selectedCustomer?.name}</span>
+            <span>مصروفات — {logCustomer?.name || logCustomer?.customerName}</span>
           </div>
         }
       >
@@ -304,13 +448,13 @@ export default function Expenses() {
                 value={totalExpenses}
                 precision={2}
                 suffix="ج.م"
-                valueStyle={{ color: '#c0392b', fontSize: 20 }}
+                valueStyle={{ color: '#27ae60', fontSize: 20 }}
               />
             </Col>
             <Col span={12}>
               <Statistic
                 title="عدد المعاملات"
-                value={customerExpenses.length}
+                value={logExpenses.length}
                 valueStyle={{ fontSize: 20 }}
               />
             </Col>
@@ -319,7 +463,7 @@ export default function Expenses() {
 
         <Table
           columns={logColumns}
-          dataSource={customerExpenses}
+          dataSource={logExpenses}
           rowKey="_id"
           loading={logLoading}
           size="small"
@@ -374,12 +518,60 @@ export default function Expenses() {
         </div>
       </Modal>
 
+      {/* نافذة تعديل المصروف */}
+      <Modal
+        open={!!editingExpense}
+        onCancel={() => setEditingExpense(null)}
+        title="تعديل مصروف"
+        onOk={handleSaveEdit}
+        okText="حفظ"
+        cancelText="إلغاء"
+        width={480}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 12 }}>
+          <Row gutter={12}>
+            <Col span={12}>
+              <label style={{ fontSize: 13, marginBottom: 4, display: 'block' }}>المبلغ</label>
+              <Input
+                type="number"
+                value={editForm.amount}
+                onChange={(e) => setEditForm({ ...editForm, amount: e.target.value })}
+              />
+            </Col>
+            <Col span={12}>
+              <label style={{ fontSize: 13, marginBottom: 4, display: 'block' }}>التاريخ</label>
+              <Input
+                type="date"
+                value={editForm.expenseDate}
+                onChange={(e) => setEditForm({ ...editForm, expenseDate: e.target.value })}
+              />
+            </Col>
+          </Row>
+          <div>
+            <label style={{ fontSize: 13, marginBottom: 4, display: 'block' }}>الفئة</label>
+            <Select
+              value={editForm.category}
+              onChange={(val) => setEditForm({ ...editForm, category: val })}
+              style={{ width: '100%' }}
+              options={EXPENSE_CATEGORIES.map((c) => ({ value: c, label: c }))}
+            />
+          </div>
+          <div>
+            <label style={{ fontSize: 13, marginBottom: 4, display: 'block' }}>البيان</label>
+            <Input
+              value={editForm.description}
+              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+            />
+          </div>
+        </div>
+      </Modal>
+
       {/* نافذة مستندات المصروف */}
       <Modal
         open={docsModalOpen}
         onCancel={() => setDocsModalOpen(false)}
         footer={null}
-        title={`مستندات المصروف`}
+        title="مستندات المصروف"
         width={500}
       >
         <Upload
