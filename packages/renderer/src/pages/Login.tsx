@@ -137,14 +137,14 @@ export default function Login() {
       `}</style>
 
       <div style={{
-        height: '100vh',
+        minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         background: '#060b16',
         position: 'relative',
-        overflow: 'hidden',
-        padding: '20px 0',
+        overflow: 'auto',
+        padding: '12px 0',
       }}>
         {/* خلفية متدرجة */}
         <div style={{
@@ -216,7 +216,7 @@ export default function Login() {
           zIndex: 1,
         }}>
           {/* الشعار */}
-          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <div style={{ textAlign: 'center', marginBottom: 14 }}>
             {/* حلقة نبض */}
             <div style={{
               position: 'relative',
@@ -234,9 +234,9 @@ export default function Login() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 90,
-                height: 90,
-                borderRadius: 24,
+                width: 76,
+                height: 76,
+                borderRadius: 20,
                 background: 'linear-gradient(145deg, rgba(15,28,46,0.95), rgba(6,11,22,0.95))',
                 border: '1px solid rgba(201,162,39,0.18)',
                 boxShadow: `
@@ -245,7 +245,7 @@ export default function Login() {
                   0 0 30px rgba(201,162,39,0.08)
                 `,
               }}>
-                <svg viewBox="0 0 60 60" width="48" height="48" fill="none">
+                <svg viewBox="0 0 60 60" width="40" height="40" fill="none">
                   <circle cx="30" cy="30" r="26" stroke="#C9A227" strokeWidth="1.2" fill="none" opacity="0.4" />
                   <line x1="30" y1="12" x2="30" y2="48" stroke="#C9A227" strokeWidth="2" strokeLinecap="round" />
                   <circle cx="30" cy="12" r="2.5" fill="#C9A227" />
@@ -263,17 +263,17 @@ export default function Login() {
 
             <h1 style={{
               color: '#C9A227',
-              fontSize: 30,
+              fontSize: 26,
               fontWeight: 700,
               fontFamily: 'Georgia, serif',
-              margin: '16px 0 2px 0',
+              margin: '12px 0 2px 0',
               letterSpacing: 3,
             }}>
               LEX <span style={{ color: '#E8E8E8' }}>PRO</span>
             </h1>
             <p style={{
               color: 'rgba(201,162,39,0.45)',
-              fontSize: 10,
+              fontSize: 9,
               letterSpacing: 5,
               margin: 0,
             }}>
@@ -286,7 +286,7 @@ export default function Login() {
               alignItems: 'center',
               justifyContent: 'center',
               gap: 8,
-              marginTop: 10,
+              marginTop: 8,
             }}>
               <div style={{ width: 32, height: 1, background: 'linear-gradient(90deg, transparent, rgba(201,162,39,0.4))' }} />
               <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#C9A227', opacity: 0.5 }} />
@@ -299,7 +299,7 @@ export default function Login() {
             position: 'relative',
             background: 'linear-gradient(165deg, rgba(17,25,40,0.7) 0%, rgba(10,16,28,0.5) 100%)',
             borderRadius: 20,
-            padding: '26px 28px',
+            padding: '20px 24px',
             border: '1px solid rgba(255,255,255,0.06)',
             boxShadow: `
               0 30px 70px rgba(0,0,0,0.6),
@@ -323,17 +323,17 @@ export default function Login() {
             <h2 style={{
               textAlign: 'center',
               color: '#E8E8E8',
-              fontSize: 19,
+              fontSize: 17,
               fontWeight: 600,
-              marginBottom: 3,
+              marginBottom: 2,
             }}>
               تسجيل الدخول
             </h2>
             <p style={{
               textAlign: 'center',
               color: 'rgba(232,232,232,0.35)',
-              fontSize: 13,
-              marginBottom: 20,
+              fontSize: 12,
+              marginBottom: 16,
             }}>
               مرحباً بعودتك، يرجى إدخال بياناتك للمتابعة
             </p>
@@ -382,7 +382,7 @@ export default function Login() {
                 />
               </Form.Item>
 
-              <Form.Item style={{ marginBottom: 0, marginTop: 18 }}>
+              <Form.Item style={{ marginBottom: 0, marginTop: 14 }}>
                 <Button
                   className="lp-btn"
                   type="primary"
@@ -391,12 +391,12 @@ export default function Login() {
                   loading={loading}
                   style={{
                     position: 'relative',
-                    height: 46,
+                    height: 42,
                     borderRadius: 12,
                     background: 'linear-gradient(135deg, #C9A227 0%, #b8932a 50%, #a68224 100%)',
                     border: 'none',
                     fontWeight: 600,
-                    fontSize: 16,
+                    fontSize: 15,
                     boxShadow: '0 6px 24px rgba(201,162,39,0.2)',
                     transition: 'all 0.3s ease',
                   }}
@@ -410,9 +410,9 @@ export default function Login() {
           {/* الدعم الفني */}
           <div style={{
             textAlign: 'center',
-            marginTop: 14,
+            marginTop: 10,
           }}>
-            <p style={{ margin: 0, fontSize: 12, color: 'rgba(232,232,232,0.3)' }}>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(232,232,232,0.3)' }}>
               تطوير: المهندس محمود البنا
             </p>
             <a
@@ -423,8 +423,8 @@ export default function Login() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 6,
-                marginTop: 6,
-                fontSize: 12,
+                marginTop: 4,
+                fontSize: 11,
                 color: 'rgba(201,162,39,0.6)',
                 textDecoration: 'none',
                 transition: 'color 0.2s ease',
@@ -440,8 +440,8 @@ export default function Login() {
           <p style={{
             textAlign: 'center',
             color: 'rgba(255,255,255,0.15)',
-            fontSize: 11,
-            marginTop: 10,
+            fontSize: 10,
+            marginTop: 8,
             letterSpacing: 0.5,
           }}>
             © 2026 LEX PRO - نظام إدارة مكاتب المحاماة
