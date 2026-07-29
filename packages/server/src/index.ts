@@ -15,8 +15,7 @@ if (!(globalThis as any).crypto) {
 }
 
 import dotenv from 'dotenv';
-import path from 'path';
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
